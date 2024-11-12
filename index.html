@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced Todo App</title>
+    <title>Todo App</title>
     <style>
         /* CSS Variables for light and dark themes */
         :root {
-            --bg-color: #f0f4f8;
-            --text-color: #333;
+            --bg-color: #91b8df;
+            --text-color: #5694d9;
             --container-bg: white;
-            --button-bg: #4CAF50;
-            --button-hover-bg: #45a049;
-            --important-bg: #ffeb3b;
-            --important-text-color: #333;
+            --button-bg: #487eb4;
+            --button-hover-bg: #2a4b80;
+            --important-bg: #f75252;
+            --important-text-color: #ffffff;
             --shadow-color: rgba(0, 0, 0, 0.2);
         }
 
         .dark-mode {
-            --bg-color: #282c36;
+            --bg-color: #1b2130;
             --text-color: #f5f5f5;
             --container-bg: #333;
-            --button-bg: #5cb85c;
-            --button-hover-bg: #6ea56e;
-            --important-bg: #ffa000;
+            --button-bg: #5694d9;
+            --button-hover-bg: #2c5395;
+            --important-bg: #f06464;
             --important-text-color: #fff;
             --shadow-color: rgba(0, 0, 0, 0.5);
         }
@@ -148,13 +148,100 @@
 </head>
 <body>
     <div class="container">
-        <h1>Enhanced Todo App</h1>
+        <h1> Todo App</h1>
         <button onclick="toggleDarkMode()" id="darkModeToggle">Switch to Dark Mode</button>
         <input type="text" id="todo_title" placeholder="Enter todo title">
         <input type="text" id="todo_desc" placeholder="Enter todo description">
-        <input type="date" id="todo_due_date" placeholder="Due Date">
         <button onclick="performOperation()">Add Todo</button>
 
         <div class="search-container">
             <input type="text" id="search_input" placeholder="Search todos" oninput="filterTodos()">
-            <button onclick
+            <button onclick="clearCompleted()">Clear Completed</button>
+        </div>
+
+        <div id="todo_display"></div>
+    </div>
+
+    <script>
+        const titleInput = document.getElementById("todo_title");
+const descInput = document.getElementById("todo_desc");
+const todoDisplay = document.getElementById("todo_display");
+let todos = [];
+
+function performOperation() {
+    if (!titleInput.value.trim() || !descInput.value.trim()) {
+        alert("Please enter both title and description.");
+        return;
+    }
+
+    const newTodo = {
+        title: titleInput.value,
+        desc: descInput.value,
+        completion: false,
+        important: false
+    };
+    todos.push(newTodo);
+    updateTodoDisplay();
+    titleInput.value = "";
+    descInput.value = "";
+}
+
+function updateTodoDisplay() {
+    const searchQuery = document.getElementById("search_input").value.toLowerCase();
+    todoDisplay.innerHTML = "";
+    todos.forEach(function(elements, index) {
+        if (elements.title.toLowerCase().includes(searchQuery)) {
+            const todo = document.createElement("div");
+            todo.className = `todo-item ${elements.important ? 'important' : ''}`;
+            todo.innerHTML = `
+                <span class="${elements.completion ? 'completed' : ''}" onclick="editTitle(${index})">
+                    ${elements.title}: ${elements.desc}
+                </span>
+                <button onclick="toggle(${index})">
+                    ${elements.completion ? 'Completed' : 'Incomplete'}
+                </button>
+                <button onclick="markImportant(${index})">
+                    ${elements.important ? 'Unmark Important' : 'Mark Important'}
+                </button>
+            `;
+            todoDisplay.appendChild(todo);
+        }
+    });
+}
+
+function toggle(index) {
+    todos[index].completion = !todos[index].completion;
+    updateTodoDisplay();
+}
+
+function markImportant(index) {
+    todos[index].important = !todos[index].important;
+    updateTodoDisplay();
+}
+
+function editTitle(index) {
+    const newTitle = prompt("Edit title:", todos[index].title);
+    if (newTitle !== null && newTitle.trim()) {
+        todos[index].title = newTitle.trim();
+        updateTodoDisplay();
+    }
+}
+
+function clearCompleted() {
+    todos = todos.filter(todo => !todo.completion);
+    updateTodoDisplay();
+}
+
+function filterTodos() {
+    updateTodoDisplay();
+}
+
+function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+    const isDarkMode = document.body.classList.contains("dark-mode");
+    document.getElementById("darkModeToggle").innerText = isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode";
+}
+
+    </script>
+</body>
+</html>
